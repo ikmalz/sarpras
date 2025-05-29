@@ -92,18 +92,6 @@ class ReturningController extends Controller
             'handled_by' => Auth::id()
         ]);
 
-        $completedReturns = \App\Models\Borrowing::where('user_id', $borrowing->user_id)
-            ->where('status', 'completed')
-            ->count();
-
-        $activeBorrowings = \App\Models\Borrowing::where('user_id', $borrowing->user_id)
-            ->whereIn('status', ['pending', 'approved', 'returned'])
-            ->count();
-
-        if ($completedReturns > 3 && $activeBorrowings === 0) {
-            $borrowing->user->revokePermissionTo('emergency_borrow');
-        }
-
         return redirect()->back()->with('success', 'Pengembalian berhasil disetujui.');
     }
 }

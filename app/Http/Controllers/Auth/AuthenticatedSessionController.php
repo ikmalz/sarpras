@@ -29,8 +29,16 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        if (!auth()->user()->hasRole('admin')) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akses hanya diperbolehkan untuk admin.',
+            ]);
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
+
 
     /**
      * Destroy an authenticated session.

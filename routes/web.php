@@ -6,8 +6,11 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LaporanBarangController;
+use App\Http\Controllers\LaporanPeminjamanController;
+use App\Http\Controllers\LaporanPengembalianController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReturningController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -97,6 +100,16 @@ Route::middleware('auth')->group(function () {
 
     // Laporan
     Route::get('/laporan', [LaporanBarangController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan', [LaporanPeminjamanController::class, 'index'])->name('laporan.index');
+
+    Route::get('/laporan/barang', [LaporanBarangController::class, 'barang'])->name('laporan.barang');
+    Route::get('/laporan/peminjaman', [LaporanPeminjamanController::class, 'index'])->name('laporan.peminjaman');
+    Route::get('/laporan/pengembalian', [LaporanPengembalianController::class, 'index'])->name('laporan.pengembalian');
+
+    Route::get('/report/stock', [ReportController::class, 'stockReport'])->name('report.stock');
+    Route::get('/report/stock/pdf', [ReportController::class, 'stockReportPdf'])->name('report.stock.pdf');
+    Route::get('/laporan-peminjaman/export-pdf', [LaporanPeminjamanController::class, 'exportPdf'])->name('laporan.peminjaman.export');
+    Route::get('/laporan/pengembalian/export', [LaporanPengembalianController::class, 'export'])->name('laporan.pengembalian.export');
 });
 
 require __DIR__ . '/auth.php';

@@ -50,6 +50,8 @@ class BorrowingController extends Controller
         ]);
     }
 
+    
+
     public function approve($id)
     {
         $borrowing = Borrowing::findOrFail($id);

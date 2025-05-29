@@ -21,4 +21,9 @@ class Item extends Model
     {
         return asset('storage/' . $this->attributes['image_url']);
     }
+
+    public function borrows()
+    {
+        return $this->hasMany(Borrowing::class);
+    }
 }

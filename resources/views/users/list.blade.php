@@ -5,7 +5,7 @@
                 {{ __('Users') }}
             </h2>
             @can('create users')
-            <a href="{{ route('users.create') }}" class="bg-slate-700 text-sm rounded-md px-3 py-2 text-white">Create</a>
+            <button onclick="openCreateModal()" class="bg-slate-700 text-sm rounded-md px-3 py-2 text-white">Create</button>
             @endcan
         </div>
     </x-slot>
@@ -88,7 +88,12 @@
                         <div id="dropdown-user-{{ $user->id }}" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10">
                             <div class="py-1 text-sm text-gray-700">
                                 @can('edit users')
-                                <a href="{{ route('users.edit', $user->id) }}" class="block px-4 py-2 hover:bg-gray-100 text-left">Edit</a>
+                                <button
+                                    class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                                    onclick="openEditModal('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ $user->roles->first()->id ?? '' }}')">
+                                    Edit
+                                </button>
+
                                 @endcan
                                 @can('delete users')
                                 <button onclick="deleteUser('{{ $user->id }}')" class="block px-4 py-2 hover:bg-gray-100 text-left w-full text-red-600">Delete</button>
@@ -116,6 +121,91 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Create User -->
+    <div id="createUserModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg w-full max-w-md p-6 relative">
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl font-bold" onclick="closeCreateModal()">×</button>
+
+            <h2 class="text-lg font-semibold mb-4">Create New User</h2>
+
+            <form action="{{ route('users.store') }}" method="POST">
+                @csrf
+
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium">Name</label>
+                    <input type="text" name="name" class="w-full border rounded px-3 py-2" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium">Email</label>
+                    <input type="email" name="email" class="w-full border rounded px-3 py-2" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium">Password</label>
+                    <input type="password" name="password" class="w-full border rounded px-3 py-2" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password_confirmation" class="block text-sm font-medium">Confirm Password</label>
+                    <input type="password" name="password_confirmation" class="w-full border rounded px-3 py-2" required>
+                </div>
+
+                <div class="mb-4">
+                    <label for="role" class="block text-sm font-medium">Role</label>
+                    <select name="role" class="w-full border rounded px-3 py-2">
+                        @foreach ($roles as $role)
+                        <option value="{{ $role->id }}">{{ ucfirst($role->name) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex justify-between">
+                    <button type="submit" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800">Simpan</button>
+                    <button type="button" onclick="closeCreateModal()" class="text-gray-600 hover:underline">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white rounded-lg w-full max-w-md p-6 relative">
+            <button class="absolute top-2 right-2 text-gray-500 hover:text-black text-2xl font-bold" onclick="closeModal('editModal')">×</button>
+
+            <h2 class="text-xl font-semibold mb-4">Edit User</h2>
+            <form id="editForm" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="mb-4">
+                    <label class="block mb-1 font-medium">Name</label>
+                    <input type="text" name="name" id="editName" required class="w-full border rounded px-3 py-2" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-1 font-medium">Email</label>
+                    <input type="email" name="email" id="editEmail" required class="w-full border rounded px-3 py-2" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-1 font-medium">Role</label>
+                    <select name="role" id="editRole" class="w-full border rounded px-3 py-2">
+                        @foreach ($roles as $role)
+                        <option value="{{ $role->id }}">{{ ucfirst($role->name) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex justify-between">
+                    <button type="button" onclick="closeModal('editModal')" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+                    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     </div>
     <x-slot name="script">
         <script type="text/javascript">
@@ -130,6 +220,34 @@
                 url.searchParams.set('rows', rows);
                 window.location.href = url.toString();
             }
+
+            function openCreateModal() {
+                document.getElementById('createUserModal').classList.remove('hidden');
+            }
+
+            function closeCreateModal() {
+                document.getElementById('createUserModal').classList.add('hidden');
+            }
+
+            function openModal(id) {
+                document.getElementById(id).classList.remove('hidden');
+            }
+
+            function closeModal(id) {
+                document.getElementById(id).classList.add('hidden');
+            }
+
+            function openEditModal(id, name, email, roleId) {
+                openModal('editModal');
+                document.getElementById('editName').value = name;
+                document.getElementById('editEmail').value = email;
+                document.getElementById('editRole').value = roleId;
+
+                const form = document.getElementById('editForm');
+                form.action = `/users/${id}`;
+            }
+
+
 
             // function deleteRole(id) {
             //     if (confirm("Are you sure you want to delete?")) {

@@ -18,12 +18,23 @@ class DashboardController extends Controller
 
         $borrows = Borrowing::with(['item', 'user'])->latest()->take(6)->get();
 
+        $notifikasiCount = Borrowing::whereIn('status', ['pending', 'returned'])->count();
+
+        $notifikasiList = Borrowing::with('item', 'user')
+            ->whereIn('status', ['pending', 'returned'])
+            ->latest()
+            ->take(5)
+            ->get();
+
+
         return view('dashboard', compact(
             'totalBarang',
             'totalUser',
             'pinjamanHariIni',
             'belumDikembalikan',
-            'borrows'
+            'borrows',
+            'notifikasiCount',
+            'notifikasiList'
         ));
     }
 }

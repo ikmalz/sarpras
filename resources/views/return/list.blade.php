@@ -67,6 +67,8 @@
                     <th class="px-4 py-2">Status</th>
                     <th class="px-4 py-2">Dikonfirmasi Oleh</th>
                     <th class="px-4 py-2">Aksi</th>
+                    <th class="px-4 py-2">Bukti Foto</th>
+                    <th class="px-4 py-2">Keterangan</th>
                 </tr>
             </thead>
             <tbody class="bg-white">
@@ -98,6 +100,19 @@
                             <i class='bx bx-check text-green-300'></i>
                         </span>
                         @endif
+                    </td>
+                    <td class="px-4 py-2">
+                        @if($return->image)
+                        <a href="{{ asset('storage/' . $return->image) }}" target="_blank">
+                            <img src="{{ asset('storage/' . $return->image) }}" alt="Bukti" class="h-16 mx-auto rounded">
+                        </a>
+                        @else
+                        <span class="text-gray-400">Tidak ada foto</span>
+                        @endif
+                    </td>
+
+                    <td class="px-4 py-2 text-sm">
+                        {{ $return->description ?? '-' }}
                     </td>
                 </tr>
                 @empty

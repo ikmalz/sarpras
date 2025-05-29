@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/store', [CategoryApiController::class, 'store']);
         Route::put('/update/{id}', [CategoryApiController::class, 'update']);
         Route::delete('/destroy/{id}', [CategoryApiController::class, 'destroy']);
+        Route::get('/{id}/items', [CategoryApiController::class, 'items']);
     });
 
     Route::prefix('items')->group(function () {

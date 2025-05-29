@@ -20,6 +20,20 @@ class CategoryApiController extends Controller
         ]);
     }
 
+    public function items($id)
+    {
+        $category = Categories::with('items')->find($id);
+
+        if (!$category) {
+            return response()->json(['message' => 'Kategori tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'data' => $category->items
+        ]);
+    }
+
+
     public function show($id)
     {
         $category = Categories::with('items')->find($id);
@@ -93,10 +107,11 @@ class CategoryApiController extends Controller
         ], 201);
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         $category = Categories::find($id);
 
-        if(!$category) {
+        if (!$category) {
             return response()->json([
                 'message' => 'Category not found.'
             ], 404);

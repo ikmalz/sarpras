@@ -47,11 +47,13 @@ class UserController extends Controller
 
         $users = request('rows', 5);
         $totalUser = User::count();
+        $roles = Role::all();
 
         $users = $query->paginate($users);
         return view('users.list', [
             'users' => $users,
-            'totalUsers' => $totalUser
+            'totalUsers' => $totalUser,
+            'roles' => $roles
         ]);
     }
 
@@ -136,7 +138,8 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->save();
 
-        $user->syncRoles($request->role);
+        $role = Role::findById($request->role);
+        $user->syncRoles($role->name);
 
         return redirect()->route('users.index', $id)->with('success', 'User updated uccessfully');
     }
@@ -147,7 +150,7 @@ class UserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-        
+
         if ($user->hasRole('admin')) {
             return response()->json(['message' => 'Cannot delete admin user.'], 403);
         }

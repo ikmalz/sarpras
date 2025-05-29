@@ -27,6 +27,18 @@ class BorrowingApiController extends Controller
             'due' => 'nullable|date|after_or_equal:now'
         ]);
 
+        $totalBorrowedQuantity = Borrowing::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'approved'])
+            ->sum('quantity');
+
+        $newTotal = $totalBorrowedQuantity + $request->quantity;
+
+        if ($newTotal > 3) {
+            return response()->json([
+                'message' => 'Total barang yang dipinjam tidak boleh lebih dari 3 unit'
+            ], 400);
+        }
+
         $item = Item::findOrFail($request->item_id);
         if ($item->stock < $request->quantity) {
             return response()->json([
@@ -91,7 +103,7 @@ class BorrowingApiController extends Controller
         $borrowing->approved_by = Auth::id();
         $borrowing->status = 'approved';
         $borrowing->approved_at = now();
-        $borrowing->due = now()->addDays(); 
+        $borrowing->due = now()->addDays();
         $borrowing->save();
 
         return response()->json([
