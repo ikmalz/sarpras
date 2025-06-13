@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Daftar Pengembalian') }}
+                {{ __('List Returning') }}
             </h2>
             <!-- @can('create users')
             <a href="{{ route('roles.create') }}" class="bg-slate-700 text-sm rounded-md px-3 py-2 text-white">Create</a>
@@ -20,147 +20,141 @@
         <div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
             <x-message></x-message>
 
-            @php
-            $options = [];
-            for ($i = 5; $i < $totalReturning; $i +=5) {
-                $options[]=$i;
-                }
-                if (!in_array($totalReturning, $options)) {
-                $options[]=$totalReturning;
-                }
-                @endphp
-
-                <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
-                <div class="flex items-center gap-2">
-                    <label for="rows_per_page" class="text-sm">Show</label>
-                    <select id="rows_per_page" class="form-select rounded-md border-gray-300 text-sm" onchange="changeRowsPerPage()">
-                        @foreach ($options as $option)
-                        <option value="{{ $option }}" {{ request('rows') == $option ? 'selected' : '' }}>{{ $option }}</option>
-                        @endforeach
-                    </select>
-                    <span class="text-sm">entries</span>
-                </div>
-
-                <div class="flex items-center gap-3 w-full max-w-md">
-                    <div class="relative w-full">
-                        <i class="bx bx-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"></i>
-                        <input type="text" name="search" id="search" placeholder="Search..." class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-300 transition" oninput="searchPermissions()" value="{{ request('search') }}">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">No</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Item</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Borrower</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Quantity</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">confirmed</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Proof</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Information</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @forelse($returns as $index => $return)
+                                <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                    <td class="px-6 py-4 text-sm text-gray-600">
+                                        {{ $returns->firstItem() + $index }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $return->borrowing->item->name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-sm text-gray-900">{{ $return->borrowing->user->name }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            {{ $return->returned_quantity }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        @if($return->is_confirmed)
+                                        <span class="text-green-600 font-semibold">Disetujui</span>
+                                        @else
+                                        <span class="text-green-600 font-semibold">Menunggu</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-12 py-4 text-sm text-gray-600">
+                                        {{ $return->handled_by ? \App\Models\User::find($return->handled_by)->name : '-' }}
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        @if(!$return->is_confirmed)
+                                        <form action="{{ route('returns.approve', $return->id) }}" method="POST" onsubmit="return confirm('setujui pengembalian ini?')">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="text-green-700 bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded text-sm">Setujui</button>
+                                        </form>
+                                        @else
+                                        <span class="text-gray-500 text-sm">Sudah disetujui</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        @if($return->image)
+                                        <a href="{{ asset('storage/' . $return->image) }}" target="_blank" class="group relative">
+                                            <img src="{{ asset('storage/' . $return->image) }}" alt="Bukti" class="h-12 w-12 rounded-lg object-cover border border-gray-200 group-hover:opacity-75 transition-opacity">
+                                            <div class="absolute inset-0 rounded-lg bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                                </svg>
+                                            </div>
+                                        </a>
+                                        @else
+                                        <div class="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                        @endif
+                                    <td class="px-6 py-4">
+                                        <span class="text-sm text-gray-600">{{ $return->description ?? '-' }}</span>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="9" class="px-6 py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                            </svg>
+                                            <p class="text-gray-500 font-medium">Belum ada data pengembalian</p>
+                                            <p class="text-gray-400 text-sm mt-1">Data pengembalian akan muncul di sini</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
-                    <h1 class="w-28">sort by</h1>
-                    <select id="sort_by" class="form-select rounded-md border-gray-300 text-sm" onchange="searchPermissions()">
-                        <option value="">All</option>
-                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Name A-Z</option>
-                        <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Name Z-A</option>
-                        <option value="created_asc" {{ request('sort') == 'created_asc' ? 'selected' : '' }}>Created Oldest</option>
-                        <option value="created_desc" {{ request('sort') == 'created_desc' ? 'selected' : '' }}>Created Newest</option>
-                    </select>
+                    @if($returns->hasPages())
+                    <div class="bg-white px-6 py-4 border-t border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-600">
+                                @php
+                                $start = $returns->firstItem();
+                                $end = $returns->lastItem();
+                                $total = $returns->total();
+                                @endphp
+                                Menampilkan <span class="font-medium">{{ $start }}</span> sampai <span class="font-medium">{{ $end }}</span> dari <span class="font-medium">{{ $total }}</span> entri
+                            </div>
+                            <div>
+                                {{ $returns->appends(['rows' => request('rows')])->links('vendor.pagination.custom') }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
         </div>
 
-        <table class="w-full">
-            <thead class="bg-gray-200">
-                <tr class="text-center">
-                    <th class="px-4 py-2">No</th>
-                    <th class="px-4 py-2">Barang</th>
-                    <th class="px-4 py-2">Peminjaman</th>
-                    <th class="px-4 py-2">Jumlah dikembalikan</th>
-                    <th class="px-4 py-2">Status</th>
-                    <th class="px-4 py-2">Dikonfirmasi Oleh</th>
-                    <th class="px-4 py-2">Aksi</th>
-                    <th class="px-4 py-2">Bukti Foto</th>
-                    <th class="px-4 py-2">Keterangan</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white">
-                @forelse($returns as $index => $return)
-                <tr class="border-t text-center">
-                    <td class="px-4 py-2">{{ $returns->firstItem() + $index }}</td>
-                    <td class="px-4 py-2">{{ $return->borrowing->item->name }}</td>
-                    <td class="px-4 py-2">{{ $return->borrowing->user->name }}</td>
-                    <td class="px-4 py-2">{{ $return->returned_quantity }}</td>
-                    <td class="px-4 py-2">
-                        @if($return->is_confirmed)
-                        <span class="text-green-600 font-semibold">Disetujui</span>
-                        @else
-                        <span class="text-green-600 font-semibold">Menunggu</span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-2">
-                        {{ $return->handled_by ? \App\Models\User::find($return->handled_by)->name : '-' }}
-                    </td>
-                    <td class="px-4 py-2">
-                        @if(!$return->is_confirmed)
-                        <form action="{{ route('returns.approve', $return->id) }}" method="POST" onsubmit="return confirm('setujui pengembalian ini?')">
-                            @csrf
-                            @method('PUT')
-                            <button type="submit" class="bg-gray-600 text-white px-3 py-1 rounded text-sm">Setujui</button>
-                        </form>
-                        @else
-                        <span class="text-gray-500">Sudah disetujui
-                            <i class='bx bx-check text-green-300'></i>
-                        </span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-2">
-                        @if($return->image)
-                        <a href="{{ asset('storage/' . $return->image) }}" target="_blank">
-                            <img src="{{ asset('storage/' . $return->image) }}" alt="Bukti" class="h-16 mx-auto rounded">
-                        </a>
-                        @else
-                        <span class="text-gray-400">Tidak ada foto</span>
-                        @endif
-                    </td>
 
-                    <td class="px-4 py-2 text-sm">
-                        {{ $return->description ?? '-' }}
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="text-center py-4">Belum ada pengembalian</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-        <div class="w-full flex justify-between items-center mt-4 text-sm text-gray-600">
-            <div>
-                @php
-                $start = $returns->firstItem();
-                $end = $returns->lastItem();
-                $total = $returns->total();
-                @endphp
-                Showing {{ $start }} to {{ $end }} of {{ $total }} entries
-            </div>
-            <div class="flex justify-between mt-2">
-                {{ $returns->appends(['rows' => request('rows')])->links('vendor.pagination.custom') }}
-            </div>
-        </div>
-    </div>
-    </div>
+        <script>
+            window.addEventListener('load', function() {
+                const spinner = document.getElementById('loadingSpinner');
+                spinner.style.display = 'none';
+            })
 
-    <script>
-        window.addEventListener('load', function() {
-            const spinner = document.getElementById('loadingSpinner');
-            spinner.style.display = 'none';
-        })
+            function searchPermissions() {
+                const search = document.getElementById('search').value;
+                const sort = document.getElementById('sort_by').value;
+                const rows = document.getElementById('rows_per_page').value;
 
-        function searchPermissions() {
-            const search = document.getElementById('search').value;
-            const sort = document.getElementById('sort_by').value;
-            const rows = document.getElementById('rows_per_page').value;
+                const url = new URL(window.location.href);
+                url.searchParams.set('search', search);
+                url.searchParams.set('sort', sort);
+                url.searchParams.set('rows', rows);
+                window.location.href = url.toString();
+            }
 
-            const url = new URL(window.location.href);
-            url.searchParams.set('search', search);
-            url.searchParams.set('sort', sort);
-            url.searchParams.set('rows', rows);
-            window.location.href = url.toString();
-        }
-
-        function changeRowsPerPage() {
-            let rowsPerPage = document.getElementById('rows_per_page').value;
-            let url = new URL(window.location.href);
-            url.searchParams.set('rows', rowsPerPage);
-            window.location.href = url.toString();
-        }
-    </script>
+            function changeRowsPerPage() {
+                let rowsPerPage = document.getElementById('rows_per_page').value;
+                let url = new URL(window.location.href);
+                url.searchParams.set('rows', rowsPerPage);
+                window.location.href = url.toString();
+            }
+        </script>
 </x-app-layout>

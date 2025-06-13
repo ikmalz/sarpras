@@ -50,7 +50,13 @@ class ReturningApiController extends Controller
 
         return response()->json([
             'Message' => 'Pengembalian berhasil menunggu persetujuan admin',
-            'data' => $return
+            'data' => [
+                'id' => $return->id,
+                'returned_quantity' => $return->returned_quantity,
+                'image' => $return->image,
+                'description' => $return->description,
+                'created_at' => $return->created_at->format('Y-m-d H:i:s'),
+            ]
         ]);
     }
 

@@ -9,7 +9,7 @@ use App\Models\Item;
 use App\Models\Returnings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Svg\Tag\Rect;
 
 class BorrowingApiController extends Controller
 {
@@ -63,7 +63,7 @@ class BorrowingApiController extends Controller
         ]);
     }
 
-    public function approve($id)
+    public function approve($id, Request $request)
     {
         if (!Auth::user()->can('approve borrowing')) {
             return response()->json(['Message' => 'Akses ditolak. Hanya admin yang dapat menyetujui'], 403);
@@ -103,8 +103,10 @@ class BorrowingApiController extends Controller
         $borrowing->approved_by = Auth::id();
         $borrowing->status = 'approved';
         $borrowing->approved_at = now();
-        $borrowing->due = now()->addDays();
+        $borrowing->due =  $request->due;
         $borrowing->save();
+
+        $borrowing->load('item');
 
         return response()->json([
             'message' => 'Peminjaman berhasil disetujui',
@@ -127,6 +129,8 @@ class BorrowingApiController extends Controller
         $borrowing->approved_by = Auth::id();
         $borrowing->approved_at = now();
         $borrowing->save();
+
+        $borrowing->load('item');
 
         return response()->json([
             'message' => 'Peminjaman berhasil ditolak',

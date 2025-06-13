@@ -11,7 +11,9 @@ class BorrowingController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Borrowing::query();
+        $query = Borrowing::query()
+            ->where('status', 'pending');
+
 
         if ($request->has('search')) {
             $query->whereHas('user', function ($q) use ($request) {
@@ -50,7 +52,7 @@ class BorrowingController extends Controller
         ]);
     }
 
-    
+
 
     public function approve($id)
     {
@@ -72,11 +74,17 @@ class BorrowingController extends Controller
 
         if ($borrowing->status != 'pending') return back()->with('error', 'Sudah diproses');
 
+        $due = $borrowing->due;
+
+        if (!$due) {
+            return back()->with('error', 'Tanggal jatuh tempo tidak ditemukan. Silakan hubungi peminjam.');
+        }
+
         $borrowing->update([
             'status' => 'approved',
             'approved_at' => now(),
             'approved_by' => Auth::id(),
-            'due' => now()->addMinutes(30),
+            'due' => $due,
         ]);
 
         return back()->with('succes', 'Peminjaman disetujui');

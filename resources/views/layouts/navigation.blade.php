@@ -17,60 +17,102 @@
 
             @auth
             @if(auth()->user()->hasRole('admin'))
-            <x-nav-link :href="route('permissions.index')" :active="request()->routeIs('permissions.index')">
-                {{ __('Permissions') }}
-            </x-nav-link>
+            @php
+            $userPermissionActive = request()->routeIs('permissions.index') || request()->routeIs('roles.index') || request()->routeIs('users.index');
+            @endphp
+            <div x-data="{ open: {{ $userPermissionActive ? 'true' : 'false' }} }">
+                <button @click="open = !open"
+                    class="flex items-center justify-between w-full px-4 py-2 text-md font-medium text-gray-600 hover:bg-gray-100 focus:outline-none">
+                    User and Permission
+                    <svg class="w-4 h-4 ml-2 transform transition-transform duration-200"
+                        :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div x-show="open" x-transition class="ml-6 mt-2 space-y-1 text-md">
+                    <a href="{{ route('permissions.index') }}"
+                        class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('permissions.index') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
+                        Permissions
+                    </a>
+                    <a href="{{ route('roles.index') }}"
+                        class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('roles.index') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
+                        Roles
+                    </a>
+                    <a href="{{ route('users.index') }}"
+                        class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('users.index') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
+                        User
+                    </a>
+                </div>
+            </div>
             @endif
             @endauth
 
 
             @auth
             @if(auth()->user()->hasRole('admin'))
-            <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index')">
-                {{ __('Roles') }}
-            </x-nav-link>
+            @php
+            $masterDataActive = request()->routeIs('categories.index') || request()->routeIs('items.index');
+            @endphp
+            <div x-data="{ open: {{ $masterDataActive ? 'true' : 'false' }} }">
+                <button @click="open = !open"
+                    class="flex items-center justify-between w-full px-4 py-2 text-md font-medium text-gray-600 hover:bg-gray-100 focus:outline-none">
+                    Master Data
+                    <svg class="w-4 h-4 ml-2 transform transition-transform duration-200"
+                        :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div x-show="open" x-transition class="ml-6 mt-2 space-y-1 text-md">
+                    <a href="{{ route('categories.index') }}"
+                        class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('categories.index') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
+                        Categories
+                    </a>
+                    <a href="{{ route('items.index') }}"
+                        class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('items.index') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
+                        Items
+                    </a>
+                </div>
+            </div>
             @endif
             @endauth
 
-            @auth
-            @if(auth()->user()->hasRole('admin'))
-            <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
-                {{ __('User') }}
-            </x-nav-link>
-            @endif
-            @endauth
 
             @auth
             @if(auth()->user()->hasRole('admin'))
-            <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.index')">
-                {{ __('Categories') }}
-            </x-nav-link>
+            @php
+            $transactionActive = request()->routeIs('borrow.index') || request()->routeIs('return.index');
+            @endphp
+            <div x-data="{ open: {{ $transactionActive ? 'true' : 'false' }} }">
+                <button @click="open = !open"
+                    class="flex items-center justify-between w-full px-4 py-2 text-md font-medium text-gray-600 hover:bg-gray-100 focus:outline-none">
+                    Transaction
+                    <svg class="w-4 h-4 ml-2 transform transition-transform duration-200"
+                        :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <div x-show="open" x-transition class="ml-6 mt-2 space-y-1 text-md">
+                    <a href="{{ route('borrow.index') }}"
+                        class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('borrow.index') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
+                        Borrow
+                    </a>
+                    <a href="{{ route('return.index') }}"
+                        class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('return.index') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
+                        Return
+                    </a>
+                </div>
+            </div>
             @endif
             @endauth
 
-            @auth
-            @if(auth()->user()->hasRole('admin'))
-            <x-nav-link :href="route('items.index')" :active="request()->routeIs('items.index')">
-                {{ __('Items') }}
-            </x-nav-link>
-            @endif
-            @endauth
-
-            @auth
-            @if(auth()->user()->hasRole('admin'))
-            <x-nav-link :href="route('borrow.index')" :active="request()->routeIs('borrow.index')">
-                {{ __('Borrow') }}
-            </x-nav-link>
-            @endif
-            @endauth
-
-            @auth
-            @if(auth()->user()->hasRole('admin'))
-            <x-nav-link :href="route('return.index')" :active="request()->routeIs('return.index')">
-                {{ __('Return') }}
-            </x-nav-link>
-            @endif
-            @endauth
 
             @auth
             @if(auth()->user()->hasRole('admin'))
@@ -80,7 +122,7 @@
             <div x-data="{ open: {{ $laporanActive ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                     class="flex items-center justify-between w-full px-4 py-2 text-md font-medium text-gray-600 hover:bg-gray-100 focus:outline-none">
-                    Laporan
+                    Report
                     <svg class="w-4 h-4 ml-2 transform transition-transform duration-200"
                         :class="{ 'rotate-180': open }" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -92,15 +134,15 @@
                 <div x-show="open" x-transition class="ml-6 mt-2 space-y-1 text-md">
                     <a href="{{ route('laporan.barang') }}"
                         class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('laporan.barang') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
-                        Laporan Barang
+                        Stock Report
                     </a>
                     <a href="{{ route('laporan.peminjaman') }}"
                         class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('laporan.peminjaman') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
-                        Laporan Peminjaman
+                        Borrow Report
                     </a>
                     <a href="{{ route('laporan.pengembalian') }}"
                         class="block px-3 py-2 rounded hover:bg-gray-100 {{ request()->routeIs('laporan.pengembalian') ? 'bg-gray-200 font-semibold text-gray-500' : 'text-gray-500' }}">
-                        Laporan Pengembalian
+                        Return Report
                     </a>
                 </div>
             </div>

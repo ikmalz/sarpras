@@ -43,6 +43,7 @@
 
 </body>
 <script src="//unpkg.com/alpinejs" defer></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 @isset($script)
 {{ $script }}

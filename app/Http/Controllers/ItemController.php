@@ -46,7 +46,7 @@ class ItemController extends Controller
         }
 
         $rowsPerPage = $request->get('rows', 5);
-        
+
         $totalItem = Item::count();
         $categories = Categories::all();
         $items = $query->paginate($rowsPerPage);
@@ -90,6 +90,31 @@ class ItemController extends Controller
             'category' => $category,
         ]);
     }
+
+    public function itemsBySlug(Request $request, $slug)
+    {
+        $rowsPerPage = $request->input('rows', 5);
+        $categories = Categories::all();
+        $category = Categories::where('slug', $slug)->first();
+
+        if (!$category) {
+            return redirect()->route('items.index')->with('error', 'Kategori tidak ditemukan.');
+        }
+
+        $items = Item::with('category')
+            ->where('category_id', $category->id)
+            ->paginate($rowsPerPage);
+
+        $totalItem = Item::where('category_id', $category->id)->count();
+
+        return view('items.list', [
+            'items' => $items,
+            'totalItem' => $totalItem,
+            'categories' => $categories,
+            'category' => $category,
+        ]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -117,7 +142,7 @@ class ItemController extends Controller
         $item->category_id = $request->category_id;
         $item->save();
 
-        return redirect()->route('items.byCategory', ['categoryId' => $item->category_id])
+        return redirect()->route('items.index')
             ->with('success', 'Item added successfully.');
     }
 

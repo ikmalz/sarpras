@@ -14,6 +14,9 @@ class ReturningController extends Controller
     {
         $query = Returnings::query();
 
+        $query->where('is_confirmed', false);
+
+
         $query->whereHas('borrowing.user', function ($q) use ($request) {
             $q->where('name', 'like', '%' . $request->search . '%');
         });

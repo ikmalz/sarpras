@@ -27,12 +27,20 @@ class PermissionController extends Controller
         }
 
         switch ($request->sort) {
-            case 'name_asc' : $query->orderBy('name', 'asc'); break;
-            case 'name_desc' : $query->orderBy('name', 'desc'); break;
-            case 'created_asc' : $query->orderBy('created_at', 'asc'); break;
-            case '$created_desc' : $query->orderBy('created_at', 'desc'); break;
+            case 'name_asc':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'created_asc':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'created_desc':
+                $query->orderBy('created_at', 'desc');
+                break;
             default;
-            $query->orderBy('created_at', 'desc');
+                $query->orderBy('created_at', 'desc');
         }
 
         $rowsPerPage = $request->get('rows', 5);
@@ -68,7 +76,9 @@ class PermissionController extends Controller
             return response()->json(['success' => true, 'id' => $permission->id]);
         }
 
-        return redirect()->route('permissions.index')->with('success', 'Permission created successfully.');
+
+        return redirect()->route('permissions.index')
+            ->with('success', 'Permission created successfully.');
     }
 
     // This method will show edit permission page
@@ -92,7 +102,8 @@ class PermissionController extends Controller
             $permission->name = $request->name;
             $permission->save();
 
-            return redirect()->route('permissions.index')->with('success', 'permission updated successfully.');
+            return redirect()->route('permissions.index')
+                ->with('success', 'Permission updated successfully.');
         } else {
             return redirect()->route('permissions.edit', $id)->withInput()->withErrors($validator);
         }
@@ -114,9 +125,9 @@ class PermissionController extends Controller
 
         $permission->delete();
 
-        session()->flash('success', 'Permission deleted successfully.');
         return response()->json([
-            'status' => true
+            'status' => true,
+            'message' => 'Permission deleted successfully.'
         ]);
     }
 }

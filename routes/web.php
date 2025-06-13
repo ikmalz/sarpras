@@ -11,6 +11,7 @@ use App\Http\Controllers\LaporanPengembalianController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportExcelController;
 use App\Http\Controllers\ReturningController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -73,7 +74,8 @@ Route::middleware('auth')->group(function () {
 
     // Items Routes
     Route::resource('items', ItemController::class);
-    Route::get('/items/category/{categoryId}', [ItemController::class, 'itemsByCategory'])->name('items.byCategory');
+    // Route::get('/items/category/{categoryId}', [ItemController::class, 'itemsByCategory'])->name('items.byCategory');
+    Route::get('/items/category/{slug}', [ItemController::class, 'itemsBySlug'])->name('items.byCategory');
     Route::get('/items', [ItemController::class, 'index'])->name('items.index');
     Route::get('/items/create', [ItemController::class, 'create'])->name('items.create');
     Route::post('/items', [ItemController::class, 'store'])->name('items.store');
@@ -110,6 +112,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/report/stock/pdf', [ReportController::class, 'stockReportPdf'])->name('report.stock.pdf');
     Route::get('/laporan-peminjaman/export-pdf', [LaporanPeminjamanController::class, 'exportPdf'])->name('laporan.peminjaman.export');
     Route::get('/laporan/pengembalian/export', [LaporanPengembalianController::class, 'export'])->name('laporan.pengembalian.export');
+    Route::get('/report/stock/excel', [ReportExcelController::class, 'exportExcel'])->name('report.stock.excel');
 });
 
 require __DIR__ . '/auth.php';
